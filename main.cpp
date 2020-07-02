@@ -293,8 +293,10 @@ int Bird::FlyingBird::flapsPerTrip(int minutesPerTrip)
 {
     while(minutesPerTrip > 0)
     {
-        return flapsPerMinute * minutesPerTrip;
+        int result;
+        result = flapsPerMinute * minutesPerTrip; 
         --minutesPerTrip;
+        return result;       
     }
     return 0;
 }
