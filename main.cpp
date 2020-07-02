@@ -246,11 +246,7 @@ Bird::~Bird()
 
 bool Bird::canSwim(bool birdFloats)
 {
-    if(birdFloats && webbedFeet)
-    {
-        return true;
-    }
-    return false;
+    return birdFloats && webbedFeet;
 }
 
 void Bird::eatMeal(float mealWeight, bool mealInShell)
@@ -291,14 +287,7 @@ void Bird::FlyingBird::migrate(bool flySouth, double tripDistance)
 
 int Bird::FlyingBird::flapsPerTrip(int minutesPerTrip)
 {
-    while(minutesPerTrip > 0)
-    {
-        int result;
-        result = flapsPerMinute * minutesPerTrip; 
-        --minutesPerTrip;
-        return result;       
-    }
-    return 0;
+    return minutesPerTrip * flapsPerMinute;
 }
 
 void Bird::FlyingBird::growWings(float growthAmount)
