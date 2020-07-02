@@ -71,9 +71,12 @@ Animal::~Animal()
 
 void Animal::walk(float currentPace, int timeWalked, bool walkForward)
 {
-   if( walkForward ){
+   if( walkForward )
+   {
        distanceWalked += (currentPace * timeWalked); 
-   } else{
+   } 
+   else
+   {
        distanceWalked -= (currentPace * timeWalked);
    }
 }
@@ -88,7 +91,8 @@ void Animal::grow(float growthHeight)
 
 void Animal::consume( int calorieIntake )
 {
-    if(isHungry){
+    if(isHungry)
+    {
         totalCalories += calorieIntake;
         mealsEaten++;
         isHungry = false;
@@ -156,9 +160,7 @@ double Ball::getVolume(bool isHollow)
     {
         return 0.0;
     }
-    double currentVolume;
-    currentVolume = (4/3)*(3.14159)*(ballRadius * ballRadius);
-    return currentVolume;
+    return (4/3)*(3.14159)*(ballRadius * ballRadius);
 }
 
 void Ball::addDimples(int howManyToAdd)
@@ -169,7 +171,8 @@ void Ball::addDimples(int howManyToAdd)
 Ball::Sandball::Sandball() :
     sandWeight(5.1f),
     fineSandFilling(true),
-    lengthOfTail(15){}
+    lengthOfTail(15)
+    {}
 
 Ball::Sandball::~Sandball()
 {
@@ -188,7 +191,7 @@ void Ball::Sandball::fillBall(int howLong)
 
 void Ball::Sandball::changeFilling()
 {
-    (fineSandFilling) ? (fineSandFilling = false) : (fineSandFilling = true);
+    fineSandFilling = !fineSandFilling;
 }
 
 void Ball::Sandball::cutTail(int cutAmount)
@@ -243,25 +246,18 @@ Bird::~Bird()
 
 bool Bird::canSwim(bool birdFloats)
 {
-    if(birdFloats)
+    if(birdFloats && webbedFeet)
     {
-        if(webbedFeet)
-        {
-            return true;
-        }
-        return false;
+        return true;
     }
     return false;
 }
 
 void Bird::eatMeal(float mealWeight, bool mealInShell)
 {
-    if(mealInShell)
+    if(mealInShell && sharpBill)
     {
-        if(sharpBill)
-        {
-            birdWeight += mealWeight;
-        }
+        birdWeight += mealWeight;
     }
 }
 
@@ -270,6 +266,7 @@ void Bird::waddle(int timeWaddling)
     while(timeWaddling > 0)
     {
         distanceWaddled += groundSpeed;
+        --timeWaddling;
     }
 }
 
@@ -297,6 +294,7 @@ int Bird::FlyingBird::flapsPerTrip(int minutesPerTrip)
     while(minutesPerTrip > 0)
     {
         return flapsPerMinute * minutesPerTrip;
+        --minutesPerTrip;
     }
     return 0;
 }
