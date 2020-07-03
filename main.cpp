@@ -462,8 +462,7 @@ int main()
     swallow.flapsPerTripCopy();
 
     emu.webbedFeet = true;
-    std::string result;
-    (emu.canSwim(true)) ? result = "can swim." : result = "can't swim.";
+    std::string result = emu.canSwim(true) ? "can swim." : "can't swim.";
     std::cout << "In the water the emu " << result << std::endl;
 
     emu.canSwimCopy();
