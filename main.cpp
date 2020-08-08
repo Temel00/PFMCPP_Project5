@@ -50,6 +50,7 @@ You don't have to do this, you can keep your current object name and just change
  UDT 1:
  */
 #include <iostream>
+#include "LeakedObjectDetector.h"
 
 struct Animal
 {
@@ -72,7 +73,7 @@ struct Animal
     {
         std::cout << "The animal has eaten " << this->totalCalories << " calories" << std::endl;
     }
-
+    JUCE_LEAK_DETECTOR(Animal)
 };
 
 Animal::Animal() : 
@@ -115,6 +116,17 @@ void Animal::consume( int calorieIntake )
     }
 }
 
+struct AnimalWrapper
+{
+    AnimalWrapper(Animal* ptr) : pointerToAnimal( ptr ){}
+    ~AnimalWrapper()
+    {
+        delete pointerToAnimal;
+    }
+    Animal* pointerToAnimal = nullptr;
+};
+
+
 /*
  UDT 2:
  */
@@ -153,6 +165,7 @@ struct Ball
         this->fineSandFilling ? (std::cout << "fine sand\n") : (std::cout << "coarse sand\n");
         }
         void cutTail(int cutAmount);
+        JUCE_LEAK_DETECTOR(Sandball)
     };
 
     Ball();
@@ -172,6 +185,7 @@ struct Ball
         this->addDimples(15);
         std::cout << "The golf ball from the coach bag now has " << this->numberOfDimples << " dimples" << std::endl;
     }
+    JUCE_LEAK_DETECTOR(Ball)
 };
 
 Ball::Ball() : 
@@ -241,6 +255,27 @@ void Ball::Sandball::cutTail(int cutAmount)
     lengthOfTail -= cutAmount;
 }
 
+struct BallWrapper
+{
+    BallWrapper(Ball* ptr) : pointerToBall( ptr ){}
+    ~BallWrapper()
+    {
+        delete pointerToBall;
+    }
+    Ball* pointerToBall = nullptr;
+};
+
+struct SandballWrapper
+{
+    SandballWrapper(Ball::Sandball* ptr) : pointerToSandball( ptr ){}
+    ~SandballWrapper()
+    {
+        delete pointerToSandball;
+    }
+
+    Ball::Sandball* pointerToSandball = nullptr;
+};
+
 /*
  UDT 3:
  */
@@ -296,8 +331,9 @@ struct Bird
             std::cout << "On a " << tripB << " minute trip a swallow flaps it's wings " << this->flapsPerTrip(tripB) << " times" << std::endl;
         }
         void growWings(float growthAmount);
-
+        JUCE_LEAK_DETECTOR(FlyingBird)
     };
+    JUCE_LEAK_DETECTOR(Bird)
 };
 
 Bird::Bird() : 
@@ -360,6 +396,28 @@ void Bird::FlyingBird::growWings(float growthAmount)
 {
     lengthOfWings += growthAmount;
 }
+
+struct FlyingBirdWrapper
+{
+    FlyingBirdWrapper(Bird::FlyingBird* ptr) : pointerToFlyingBird( ptr ){}
+    ~FlyingBirdWrapper()
+    {
+        delete pointerToFlyingBird;
+    }
+
+    Bird::FlyingBird* pointerToFlyingBird = nullptr;
+};
+
+struct BirdWrapper
+{
+    BirdWrapper(Bird* ptr) : pointerToBird( ptr ){}
+    ~BirdWrapper()
+    {
+        delete pointerToBird;
+    }
+    Bird* pointerToBird = nullptr;
+};
+
 /*
  new UDT 4:
  */
@@ -372,6 +430,7 @@ struct Zoo
 
     Zoo(){}
     ~Zoo();
+    JUCE_LEAK_DETECTOR(Zoo)
 };
 
 Zoo::~Zoo()
@@ -380,6 +439,16 @@ Zoo::~Zoo()
     parrot.growWings(0.5f);
     std::cout << "Now they are " << parrot.lengthOfWings << " inches long" << std::endl;
 }
+
+struct ZooWrapper
+{
+    ZooWrapper(Zoo* ptr) : pointerToZoo( ptr ){}
+    ~ZooWrapper()
+    {
+        delete pointerToZoo;
+    }
+    Zoo* pointerToZoo = nullptr;
+};
 
 /*
  new UDT 5:
@@ -393,12 +462,23 @@ struct BagOfBalls
 
     BagOfBalls(){}
     ~BagOfBalls();
+    JUCE_LEAK_DETECTOR(BagOfBalls)
 };
 
 BagOfBalls::~BagOfBalls()
 {
     std::cout << "The bag of balls has been destroyed" << std::endl;
 }
+
+struct BagOfBallsWrapper
+{
+    BagOfBallsWrapper(BagOfBalls* ptr) : pointerToBagOfBalls( ptr ){}
+    ~BagOfBallsWrapper()
+    {
+        delete pointerToBagOfBalls;
+    }
+    BagOfBalls* pointerToBagOfBalls = nullptr;
+};
 
 /*
  MAKE SURE YOU ARE NOT ON THE MASTER BRANCH
@@ -414,76 +494,77 @@ BagOfBalls::~BagOfBalls()
 
 int main()
 {
-    Zoo Bronx;
-    Zoo Philly;
-    BagOfBalls coachBag;
-    BagOfBalls practiceBag;
-    Animal dog;
-    Animal horse;
-    Bird::FlyingBird swallow;
-    Bird emu;
-    Ball baseball;
-    Ball::Sandball weightedBall;
+    AnimalWrapper dog (new Animal());
+    AnimalWrapper horse (new Animal());
+    ZooWrapper Bronx (new Zoo());
+    ZooWrapper Philly (new Zoo());
+    BagOfBallsWrapper coachBag (new BagOfBalls());
+    BagOfBallsWrapper practiceBag (new BagOfBalls());
+    FlyingBirdWrapper swallow (new Bird::FlyingBird());
+    BirdWrapper emu (new Bird());
+    BallWrapper baseball (new Ball());
+    SandballWrapper weightedBall (new Ball::Sandball());
 
-    dog.consume(2400);
-    std::cout << "The animal has eaten " << dog.totalCalories << " calories" << std::endl;
+    //dog.consume(2400);
+    dog.pointerToAnimal->consume(2400);
+    std::cout << "The animal has eaten " << dog.pointerToAnimal->totalCalories << " calories" << std::endl;
 
-    dog.consumeCopy();
+    dog.pointerToAnimal->consumeCopy();
 
-    horse.walk(2.1f, 60, true);
-    std::cout << "The animal walked " << horse.distanceWalked << " miles" << std::endl;
+    horse.pointerToAnimal->walk(2.1f, 60, true);
+    std::cout << "The animal walked " << horse.pointerToAnimal->distanceWalked << " miles" << std::endl;
 
-    horse.walkCopy();
+    horse.pointerToAnimal->walkCopy();
 
     int tripA = 90;
     int tripB = 60;
     
-    std::cout << "On a " << tripA << " minute trip a swallow flaps it's wings " << swallow.flapsPerTrip(tripA) << " times" << std::endl;
+    std::cout << "On a " << tripA << " minute trip a swallow flaps it's wings " << swallow.pointerToFlyingBird->flapsPerTrip(tripA) << " times" << std::endl;
 
-    std::cout << "On a " << tripB << " minute trip a swallow flaps it's wings " << swallow.flapsPerTrip(tripB) << " times" << std::endl;
+    std::cout << "On a " << tripB << " minute trip a swallow flaps it's wings " << swallow.pointerToFlyingBird->flapsPerTrip(tripB) << " times" << std::endl;
 
-    swallow.flapsPerTripCopy();
+    swallow.pointerToFlyingBird->flapsPerTripCopy();
 
-    emu.webbedFeet = true;
-    std::string result = emu.canSwim(true) ? "can swim." : "can't swim.";
+    emu.pointerToBird->webbedFeet = true;
+    std::string result = emu.pointerToBird->canSwim(true) ? "can swim." : "can't swim.";
     std::cout << "In the water the emu " << result << std::endl;
 
-    emu.canSwimCopy();
+    emu.pointerToBird->canSwimCopy();
 
-    std::cout << "The baseball weighed " << baseball.ballWeight << " ounces" << std::endl;
-    baseball.getHeavier(true, 2);
-    std::cout << "I left the baseball in the rain and it now weighs " << baseball.ballWeight << " ounces" << std::endl;
+    std::cout << "The baseball weighed " << baseball.pointerToBall->ballWeight << " ounces" << std::endl;
+    baseball.pointerToBall->getHeavier(true, 2);
+    std::cout << "I left the baseball in the rain and it now weighs " << baseball.pointerToBall->ballWeight << " ounces" << std::endl;
 
-    baseball.getHeavierCopy();
+    baseball.pointerToBall->getHeavierCopy();
 
-    std::cout << "The weighted ball was " << weightedBall.percentFilled << " percent filled" << std::endl;
-    weightedBall.fillBall(10);
-    std::cout << "I filled it more and it is now " << weightedBall.percentFilled << " percent filled" << std::endl;
+    std::cout << "The weighted ball was " << weightedBall.pointerToSandball->percentFilled << " percent filled" << std::endl;
+    weightedBall.pointerToSandball->fillBall(10);
+    std::cout << "I filled it more and it is now " << weightedBall.pointerToSandball->percentFilled << " percent filled" << std::endl;
 
-    weightedBall.fillBallCopy();
+    weightedBall.pointerToSandball->fillBallCopy();
 
-    Bronx.parrot.migrate(true, 200);
-    std::cout << "They let their parrot migrate for the winter and it flew " << Bronx.parrot.migrationDistance << " miles South" << std::endl;
+    Bronx.pointerToZoo->parrot.migrate(true, 200);
+    std::cout << "They let their parrot migrate for the winter and it flew " << Bronx.pointerToZoo->parrot.migrationDistance << " miles South" << std::endl;
 
-    Philly.parrot.migrate(true, 600);
-    std::cout << "Philly also let their parrot migrate for the winter and it flew " << Philly.parrot.migrationDistance << " miles South" << std::endl;
+    Philly.pointerToZoo->parrot.migrate(true, 600);
+    std::cout << "Philly also let their parrot migrate for the winter and it flew " << Philly.pointerToZoo->parrot.migrationDistance << " miles South" << std::endl;
 
-    Bronx.parrot.migrateCopy();
-    Philly.parrot.migrateCopy();
+    Bronx.pointerToZoo->parrot.migrateCopy();
+    Philly.pointerToZoo->parrot.migrateCopy();
 
-    std::cout << "The golf ball in the coach bag started out with " << coachBag.golfBall.numberOfDimples << " dimples" << std::endl;
-    coachBag.golfBall.addDimples(15);
-    std::cout << "The golf ball from the coach bag now has " << coachBag.golfBall.numberOfDimples << " dimples" << std::endl;
+    std::cout << "The golf ball in the coach bag started out with " << coachBag.pointerToBagOfBalls->golfBall.numberOfDimples << " dimples" << std::endl;
+    coachBag.pointerToBagOfBalls->golfBall.addDimples(15);
+    std::cout << "The golf ball from the coach bag now has " << coachBag.pointerToBagOfBalls->golfBall.numberOfDimples << " dimples" << std::endl;
     
-    coachBag.golfBall.addDimplesCopy();
+    coachBag.pointerToBagOfBalls->golfBall.addDimplesCopy();
 
     std::cout << "We changed the filling in the hackySack from ";
-    practiceBag.hackySack.fineSandFilling ? (std::cout << "fine sand") : (std::cout << "coarse sand");
-    practiceBag.hackySack.changeFilling();
+    practiceBag.pointerToBagOfBalls->hackySack.fineSandFilling ? (std::cout << "fine sand") : (std::cout << "coarse sand");
+    practiceBag.pointerToBagOfBalls->hackySack.changeFilling();
     std::cout << " to ";
-    practiceBag.hackySack.fineSandFilling ? (std::cout << "fine sand\n") : (std::cout << "coarse sand\n");
+    practiceBag.pointerToBagOfBalls->hackySack.fineSandFilling ? (std::cout << "fine sand\n") : (std::cout << "coarse sand\n");
 
-    practiceBag.hackySack.changeFillingCopy();
+    practiceBag.pointerToBagOfBalls->hackySack.changeFillingCopy();
 
     std::cout << "good to go!" << std::endl;
 }
