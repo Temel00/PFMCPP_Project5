@@ -404,7 +404,7 @@ struct FlyingBirdWrapper
     {
         delete pointerToFlyingBird;
     }
-
+    
     Bird::FlyingBird* pointerToFlyingBird = nullptr;
 };
 
@@ -496,8 +496,8 @@ int main()
 {
     AnimalWrapper dog (new Animal());
     AnimalWrapper horse (new Animal());
-    ZooWrapper Bronx (new Zoo());
-    ZooWrapper Philly (new Zoo());
+    ZooWrapper bronx (new Zoo());
+    ZooWrapper philly (new Zoo());
     BagOfBallsWrapper coachBag (new BagOfBalls());
     BagOfBallsWrapper practiceBag (new BagOfBalls());
     FlyingBirdWrapper swallow (new Bird::FlyingBird());
@@ -543,14 +543,14 @@ int main()
 
     weightedBall.pointerToSandball->fillBallCopy();
 
-    Bronx.pointerToZoo->parrot.migrate(true, 200);
-    std::cout << "They let their parrot migrate for the winter and it flew " << Bronx.pointerToZoo->parrot.migrationDistance << " miles South" << std::endl;
+    bronx.pointerToZoo->parrot.migrate(true, 200);
+    std::cout << "They let their parrot migrate for the winter and it flew " << bronx.pointerToZoo->parrot.migrationDistance << " miles South" << std::endl;
 
-    Philly.pointerToZoo->parrot.migrate(true, 600);
-    std::cout << "Philly also let their parrot migrate for the winter and it flew " << Philly.pointerToZoo->parrot.migrationDistance << " miles South" << std::endl;
+    philly.pointerToZoo->parrot.migrate(true, 600);
+    std::cout << "Philly also let their parrot migrate for the winter and it flew " << philly.pointerToZoo->parrot.migrationDistance << " miles South" << std::endl;
 
-    Bronx.pointerToZoo->parrot.migrateCopy();
-    Philly.pointerToZoo->parrot.migrateCopy();
+    bronx.pointerToZoo->parrot.migrateCopy();
+    philly.pointerToZoo->parrot.migrateCopy();
 
     std::cout << "The golf ball in the coach bag started out with " << coachBag.pointerToBagOfBalls->golfBall.numberOfDimples << " dimples" << std::endl;
     coachBag.pointerToBagOfBalls->golfBall.addDimples(15);
